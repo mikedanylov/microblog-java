@@ -21,6 +21,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import sun.misc.BASE64Encoder;
 
 import java.io.UnsupportedEncodingException;
@@ -29,7 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 
 public class UserDAO {
     private final MongoCollection<Document> usersCollection;
@@ -49,14 +50,19 @@ public class UserDAO {
         // be sure to add username and hashed password to the document. problem instructions
         // will tell you the schema that the documents must follow.
 
+        Document doc = new Document("_id", username)
+                .append("password", password);
+
         if (email != null && !email.equals("")) {
             // XXX WORK HERE
             // if there is an email address specified, add it to the document too.
+            doc.append("email", email);
         }
 
         try {
             // XXX WORK HERE
             // insert the document into the user collection here
+            usersCollection.insertOne(doc);
             return true;
         } catch (MongoWriteException e) {
             if (e.getError().getCategory().equals(ErrorCategory.DUPLICATE_KEY)) {
@@ -69,23 +75,25 @@ public class UserDAO {
 
     public Document validateLogin(String username, String password) {
         Document user = null;
-
         // XXX look in the user collection for a user that has this username
         // assign the result to the user variable.
+        user = usersCollection.find(eq("_id", username)).first();
+
+        System.out.println(user);
 
         if (user == null) {
             System.out.println("User not in database");
             return null;
         }
 
-        String hashedAndSalted = user.get("password").toString();
+//        String hashedAndSalted = user.getString("password");
 
-        String salt = hashedAndSalted.split(",")[1];
+//        String salt = hashedAndSalted.split(",")[1];
 
-        if (!hashedAndSalted.equals(makePasswordHash(password, salt))) {
-            System.out.println("Submitted password is not a match");
-            return null;
-        }
+//        if (!hashedAndSalted.equals(makePasswordHash(password, hashedAndSalted))) {
+//            System.out.println("Submitted password is not a match");
+//            return null;
+//        }
 
         return user;
     }
