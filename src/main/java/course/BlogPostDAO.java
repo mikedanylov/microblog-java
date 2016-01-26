@@ -44,7 +44,7 @@ public class BlogPostDAO {
         permalink = permalink.replaceAll("\\W", ""); // get rid of non alphanumeric
         permalink = permalink.toLowerCase();
         permalink = permalink+ (new Date()).getTime();
-        
+
         Document post = new Document();
 
         post.append("author", username)
@@ -64,11 +64,13 @@ public class BlogPostDAO {
     public void addPostComment(final String name, final String email, final String body,
                                final String permalink) {
 
-        // todo  XXX
-        // Hints:
-        // - email is optional and may come in NULL. Check for that.
-        // - best solution uses an update command to the database and a suitable
-        //   operator to append the comment on to any existing list of comments
-
+        postsCollection.updateOne(eq("permalink", permalink),
+            new Document("$push",
+                new Document("comments",
+                    new Document("author", name)
+                    .append("body", body)
+                    .append("email", email))
+            )
+        );
     }
 }
