@@ -9,6 +9,9 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Sorts.*;
+
 public class BlogPostDAO {
     MongoCollection<Document> postsCollection;
 
@@ -18,25 +21,17 @@ public class BlogPostDAO {
 
     // Return a single post corresponding to a permalink
     public Document findByPermalink(String permalink) {
-
-        // todo  XXX
-        Document post = null;
-
-
-
-
+        Document post = postsCollection.find(eq("permalink", permalink)).first();
         return post;
     }
 
     // Return a list of posts in descending order. Limit determines
     // how many posts are returned.
     public List<Document> findByDateDescending(int limit) {
-
-        // todo,  XXX
         // Return a list of Documents, each one a post from the posts collection
-        List<Document> posts = null;
-
-
+        List<Document> posts = postsCollection.find()
+                                            .sort(descending("date"))
+                                            .into(new ArrayList<Document>());
         return posts;
     }
 
