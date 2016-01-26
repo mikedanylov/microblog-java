@@ -44,37 +44,21 @@ public class BlogPostDAO {
         permalink = permalink.replaceAll("\\W", ""); // get rid of non alphanumeric
         permalink = permalink.toLowerCase();
         permalink = permalink+ (new Date()).getTime();
-
-
-        // todo XXX
-        // Remember that a valid post has the following keys:
-        // author, body, permalink, tags, comments, date
-        //
-        // A few hints:
-        // - Don't forget to create an empty list of comments
-        // - for the value of the date key, today's datetime is fine.
-        // - tags are already in list form that implements suitable interface.
-        // - we created the permalink for you above.
-
-        // Build the post object and insert it
+        
         Document post = new Document();
 
+        post.append("author", username)
+                .append("title", title)
+                .append("body", body)
+                .append("permalink", permalink)
+                .append("tags", tags)
+                .append("comments", new ArrayList<Document>())
+                .append("date", new Date());
 
+        postsCollection.insertOne(post);
 
         return permalink;
     }
-
-
-
-
-    // White space to protect the innocent
-
-
-
-
-
-
-
 
     // Append a comment to a blog post
     public void addPostComment(final String name, final String email, final String body,
